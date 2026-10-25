@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kedai Mama Freya - Pemesanan Online & Kasir POS</title>
+    <title>Kedai Mama Freya - Web Apps & Sistem Kasir POS</title>
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -34,7 +34,7 @@
     <!-- SheetJS Excel Export -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-    <!-- FIREBASE COMPAT SDKs (v9 Compat) -->
+    <!-- FIREBASE SDK (v9 Compat) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
@@ -50,7 +50,7 @@
     <!-- TOP NAVIGATION BAR -->
     <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md shadow-sm border-b border-brand-cream-dark/50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('customer')">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="showRoleSelection()">
                 <div class="w-10 h-10 rounded-full bg-brand-pink/10 flex items-center justify-center border-2 border-brand-pink">
                     <i data-lucide="utensils" class="text-brand-pink w-5 h-5"></i>
                 </div>
@@ -60,18 +60,22 @@
                 </div>
             </div>
 
-            <div class="flex items-center space-x-2 sm:space-x-4">
-                <button onclick="switchView('track')" class="text-xs sm:text-sm font-semibold text-gray-700 hover:text-brand-green px-3 py-1.5 rounded-lg border border-gray-200 hover:border-brand-green transition flex items-center gap-1.5">
-                    <i data-lucide="search" class="w-4 h-4"></i>
-                    <span class="hidden sm:inline">Cek Pesanan</span>
+            <!-- Role Switcher & Header Controls -->
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <button onclick="showRoleSelection()" class="text-xs font-bold bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-xl transition flex items-center gap-1">
+                    <i data-lucide="users" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline">Ganti Peran</span>
                 </button>
-                <button onclick="toggleCartDrawer()" class="relative p-2 text-gray-700 hover:text-brand-pink bg-brand-pink-light/50 rounded-full transition">
-                    <i data-lucide="shopping-bag" class="w-6 h-6"></i>
-                    <span id="cart-badge" class="absolute -top-1 -right-1 bg-brand-pink text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white hidden">0</span>
-                </button>
-                <button onclick="switchView('admin-login')" class="p-2 text-gray-500 hover:text-brand-green rounded-full hover:bg-gray-100 transition" title="Dashboard Admin / Kasir">
-                    <i data-lucide="shield-check" class="w-6 h-6"></i>
-                </button>
+                <div id="customer-nav-controls" class="flex items-center gap-2">
+                    <button onclick="switchView('track')" class="text-xs font-semibold text-gray-700 hover:text-brand-green px-3 py-1.5 rounded-xl border border-gray-200 transition flex items-center gap-1">
+                        <i data-lucide="search" class="w-4 h-4"></i>
+                        <span class="hidden sm:inline">Cek Pesanan</span>
+                    </button>
+                    <button onclick="toggleCartDrawer()" class="relative p-2 text-gray-700 hover:text-brand-pink bg-brand-pink-light/50 rounded-full transition">
+                        <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                        <span id="cart-badge" class="absolute -top-1 -right-1 bg-brand-pink text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
+                    </button>
+                </div>
             </div>
         </div>
     </header>
@@ -79,8 +83,51 @@
     <!-- MAIN CONTAINER -->
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
-        <!-- VIEW: CUSTOMER MENU -->
-        <section id="view-customer" class="space-y-6">
+        <!-- VIEW: PILIHAN PERAN AWAL -->
+        <section id="view-role-selection" class="max-w-3xl mx-auto py-8 space-y-8">
+            <div class="text-center space-y-3">
+                <span class="px-3 py-1 bg-brand-pink-light text-brand-pink text-xs font-bold rounded-full">Selamat Datang</span>
+                <h2 class="text-2xl sm:text-3xl font-black text-gray-900">Pilih Mode Akses Anda</h2>
+                <p class="text-xs sm:text-sm text-gray-500 max-w-md mx-auto">Silakan pilih portal akses yang ingin Anda gunakan di KEDAI MAMA FREYA</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <!-- Mode Pelanggan -->
+                <div onclick="selectRole('customer')" class="bg-white p-6 rounded-3xl border-2 border-brand-green/20 hover:border-brand-green shadow-sm hover:shadow-xl transition cursor-pointer group flex flex-col justify-between space-y-6">
+                    <div class="space-y-4">
+                        <div class="w-14 h-14 rounded-2xl bg-brand-green-light flex items-center justify-center text-brand-green group-hover:scale-110 transition duration-300">
+                            <i data-lucide="shopping-bag" class="w-7 h-7"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-900">Mode Pelanggan</h3>
+                            <p class="text-xs text-gray-500 mt-1">Pesan menu favorit online, bayar via QRIS/Transfer, dan kirim pesanan otomatis ke WhatsApp.</p>
+                        </div>
+                    </div>
+                    <button class="w-full py-3 bg-brand-green group-hover:bg-brand-green-dark text-white font-extrabold text-xs rounded-xl shadow transition flex items-center justify-center gap-2">
+                        Masuk Menu Pelanggan <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <!-- Mode Pemilik Kedai -->
+                <div onclick="selectRole('admin')" class="bg-white p-6 rounded-3xl border-2 border-brand-pink/20 hover:border-brand-pink shadow-sm hover:shadow-xl transition cursor-pointer group flex flex-col justify-between space-y-6">
+                    <div class="space-y-4">
+                        <div class="w-14 h-14 rounded-2xl bg-brand-pink-light flex items-center justify-center text-brand-pink group-hover:scale-110 transition duration-300">
+                            <i data-lucide="store" class="w-7 h-7"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-900">Mode Pemilik Kedai</h3>
+                            <p class="text-xs text-gray-500 mt-1">Konfirmasi pesanan masuk, atur stok menu, kasir POS, dan lihat laporan keuangan.</p>
+                        </div>
+                    </div>
+                    <button class="w-full py-3 bg-brand-pink group-hover:bg-pink-600 text-white font-extrabold text-xs rounded-xl shadow transition flex items-center justify-center gap-2">
+                        Masuk Dashboard Pemilik <i data-lucide="shield-check" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: MENU PELANGGAN -->
+        <section id="view-customer" class="hidden space-y-6">
             <div id="store-status-banner" class="rounded-2xl p-4 sm:p-6 bg-gradient-to-r from-brand-green to-emerald-700 text-white shadow-lg relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div class="relative z-10 space-y-1">
                     <span id="store-badge" class="inline-block px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-semibold tracking-wide">
@@ -88,11 +135,6 @@
                     </span>
                     <h2 class="text-xl sm:text-2xl font-black">Selamat Datang di Kedai Mama Freya! 🍩✨</h2>
                     <p class="text-xs sm:text-sm text-emerald-100 max-w-xl">Pesan makanan favoritmu online, bayar via QRIS/Transfer, dan konfirmasi langsung lewat WhatsApp resmi kami!</p>
-                </div>
-                <div class="relative z-10 flex gap-2">
-                    <a href="#menu-section" class="px-4 py-2 bg-brand-pink hover:bg-pink-600 text-white font-bold text-sm rounded-xl shadow transition flex items-center gap-2">
-                        <i data-lucide="utensils-crossed" class="w-4 h-4"></i> Pesan Sekarang
-                    </a>
                 </div>
             </div>
 
@@ -102,19 +144,14 @@
                         <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
                         <input type="text" id="menu-search" oninput="renderCustomerMenu()" placeholder="Cari menu favorit..." class="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-green">
                     </div>
-                    <div class="text-xs text-gray-500 font-medium flex items-center gap-1.5 self-end sm:self-center">
-                        <i data-lucide="clock" class="w-4 h-4 text-brand-green"></i>
-                        <span id="display-store-hours">Jam Buka: 10:00 - 21:00 WIB</span>
-                    </div>
                 </div>
-
                 <div class="flex items-center gap-2 overflow-x-auto pb-2 hide-scrollbar" id="category-chips"></div>
             </div>
 
             <div id="customer-menu-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6"></div>
         </section>
 
-        <!-- VIEW: TRACK ORDER -->
+        <!-- VIEW: TRACK PESANAN -->
         <section id="view-track" class="hidden max-w-xl mx-auto space-y-6">
             <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm text-center space-y-4">
                 <div class="w-12 h-12 bg-brand-green-light rounded-full flex items-center justify-center mx-auto text-brand-green">
@@ -122,7 +159,7 @@
                 </div>
                 <div>
                     <h2 class="text-xl font-bold text-gray-900">Lacak Status Pesanan</h2>
-                    <p class="text-xs text-gray-500 mt-1">Masukkan Nomor Pesanan yang Anda terima saat checkout</p>
+                    <p class="text-xs text-gray-500 mt-1">Masukkan Nomor Pesanan unik Anda</p>
                 </div>
                 <div class="flex gap-2">
                     <input type="text" id="track-order-id" placeholder="Contoh: KMF-20261025-ABCD" class="flex-grow px-4 py-2.5 border border-gray-300 rounded-xl text-sm font-mono uppercase focus:ring-2 focus:ring-brand-green focus:outline-none">
@@ -133,38 +170,38 @@
             <div id="track-result" class="hidden bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4"></div>
         </section>
 
-        <!-- VIEW: ADMIN LOGIN -->
-        <section id="view-admin-login" class="hidden max-w-md mx-auto my-12">
+        <!-- VIEW: LOGIN AKUN PEMILIK KEDAI -->
+        <section id="view-admin-login" class="hidden max-w-md mx-auto my-8">
             <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-xl space-y-6">
                 <div class="text-center space-y-2">
                     <div class="w-16 h-16 bg-brand-pink-light rounded-full flex items-center justify-center mx-auto text-brand-pink">
                         <i data-lucide="lock" class="w-8 h-8"></i>
                     </div>
-                    <h2 class="text-2xl font-black text-gray-900">Login Pengelola</h2>
-                    <p class="text-xs text-gray-500">Masuk ke Dashboard Admin & Sistem Kasir POS</p>
+                    <h2 class="text-2xl font-black text-gray-900">Login Pemilik Kedai</h2>
+                    <p class="text-xs text-gray-500">Masuk ke Dashboard Pengelola & Sistem Kasir POS</p>
                 </div>
 
                 <form onsubmit="handleAdminLogin(event)" class="space-y-4">
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Username</label>
-                        <input type="text" id="login-username" required value="admin" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-green focus:outline-none">
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Username Pemilik</label>
+                        <input type="text" id="login-username" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-green focus:outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Password</label>
-                        <input type="password" id="login-password" required value="admin123" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-green focus:outline-none">
+                        <input type="password" id="login-password" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-green focus:outline-none">
                     </div>
-                    <button type="submit" class="w-full py-3 bg-brand-green hover:bg-brand-green-dark text-white font-bold rounded-xl shadow-md transition">Masuk Sistem</button>
-                    <p class="text-center text-xs text-gray-400">Default demo: admin / admin123</p>
+                    <button type="submit" class="w-full py-3 bg-brand-green hover:bg-brand-green-dark text-white font-bold rounded-xl shadow-md transition">Masuk Dashboard</button>
+                    <p class="text-center text-xs text-gray-400">Akun default: <b>admin</b> / <b>admin123</b></p>
                 </form>
             </div>
         </section>
 
-        <!-- VIEW: ADMIN DASHBOARD -->
+        <!-- VIEW: DASHBOARD PEMILIK KEDAI -->
         <section id="view-admin-dashboard" class="hidden space-y-6">
             <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-gray-200 shadow-sm">
                 <div class="flex items-center space-x-2">
                     <span class="w-3 h-3 bg-green-500 rounded-full animate-ping"></span>
-                    <span class="text-sm font-bold text-gray-900">Admin Panel Kedai Mama Freya</span>
+                    <span class="text-sm font-bold text-gray-900">Dashboard Pemilik Kedai</span>
                 </div>
                 <div class="flex flex-wrap gap-2">
                     <button onclick="switchAdminTab('overview')" class="admin-tab-btn active px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-brand-green text-white" id="tab-overview">
@@ -183,11 +220,8 @@
                     <button onclick="switchAdminTab('expenses')" class="admin-tab-btn px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-gray-100 text-gray-700 hover:bg-gray-200" id="tab-expenses">
                         <i data-lucide="wallet" class="w-4 h-4"></i> Pengeluaran
                     </button>
-                    <button onclick="switchAdminTab('reports')" class="admin-tab-btn px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-gray-100 text-gray-700 hover:bg-gray-200" id="tab-reports">
-                        <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Laporan
-                    </button>
-                    <button onclick="switchAdminTab('settings')" class="admin-tab-btn px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-gray-100 text-gray-700 hover:bg-gray-200" id="tab-settings">
-                        <i data-lucide="settings" class="w-4 h-4"></i> Pengaturan
+                    <button onclick="switchAdminTab('account')" class="admin-tab-btn px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-gray-100 text-gray-700 hover:bg-gray-200" id="tab-account">
+                        <i data-lucide="user-cog" class="w-4 h-4"></i> Akun Pemilik
                     </button>
                     <button onclick="logoutAdmin()" class="px-3.5 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-xl text-xs font-bold transition flex items-center gap-1.5">
                         <i data-lucide="log-out" class="w-4 h-4"></i> Keluar
@@ -195,35 +229,31 @@
                 </div>
             </div>
 
-            <!-- ADMIN OVERVIEW -->
+            <!-- ADMIN TAB 1: OVERVIEW -->
             <div id="admin-panel-overview" class="space-y-6">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm space-y-1">
                         <span class="text-xs text-gray-500 font-bold uppercase">Penjualan Hari Ini</span>
                         <div class="text-xl sm:text-2xl font-black text-brand-green" id="dash-sales-today">Rp0</div>
-                        <span class="text-[11px] text-gray-400" id="dash-tx-today">0 transaksi</span>
                     </div>
                     <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm space-y-1">
-                        <span class="text-xs text-gray-500 font-bold uppercase">Penjualan Bulan Ini</span>
-                        <div class="text-xl sm:text-2xl font-black text-emerald-700" id="dash-sales-month">Rp0</div>
-                        <span class="text-[11px] text-gray-400" id="dash-tx-month">0 transaksi</span>
+                        <span class="text-xs text-gray-500 font-bold uppercase">Total Pesanan</span>
+                        <div class="text-xl sm:text-2xl font-black text-emerald-700" id="dash-sales-month">0</div>
                     </div>
                     <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm space-y-1">
                         <span class="text-xs text-gray-500 font-bold uppercase">Pesanan Online</span>
                         <div class="text-xl sm:text-2xl font-black text-brand-pink" id="dash-online-count">0</div>
-                        <span class="text-[11px] text-amber-600 font-semibold" id="dash-pending-count">0 perlu konfirmasi</span>
                     </div>
                     <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm space-y-1">
-                        <span class="text-xs text-gray-500 font-bold uppercase">Laba Bersih Bulan Ini</span>
+                        <span class="text-xs text-gray-500 font-bold uppercase">Laba Bersih</span>
                         <div class="text-xl sm:text-2xl font-black text-indigo-700" id="dash-net-profit">Rp0</div>
-                        <span class="text-[11px] text-gray-400" id="dash-total-expenses">Pengeluaran: Rp0</span>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
                         <h3 class="text-base font-bold text-gray-900 flex items-center gap-2">
-                            <i data-lucide="trending-up" class="w-5 h-5 text-brand-green"></i> Grafik Penjualan 7 Hari Terakhir
+                            <i data-lucide="trending-up" class="w-5 h-5 text-brand-green"></i> Grafik Penjualan
                         </h3>
                         <div class="h-64"><canvas id="salesChart"></canvas></div>
                     </div>
@@ -236,11 +266,11 @@
                 </div>
             </div>
 
-            <!-- ADMIN POS -->
+            <!-- ADMIN TAB 2: KASIR POS -->
             <div id="admin-panel-pos" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="lg:col-span-2 space-y-4">
-                    <div class="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm flex gap-3">
-                        <input type="text" id="pos-search" oninput="renderPosMenu()" placeholder="Cari menu kasir..." class="w-full px-4 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-green focus:outline-none">
+                    <div class="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm">
+                        <input type="text" id="pos-search" oninput="renderPosMenu()" placeholder="Cari menu kasir..." class="w-full px-4 py-2 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-green">
                     </div>
                     <div id="pos-menu-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
                 </div>
@@ -257,7 +287,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-700 mb-1">Metode Pembayaran</label>
-                            <select id="pos-payment-method" onchange="togglePosCashInput()" class="w-full px-3 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-green">
+                            <select id="pos-payment-method" onchange="togglePosCashInput()" class="w-full px-3 py-2 border rounded-xl text-sm">
                                 <option value="Tunai">Tunai / Cash</option>
                                 <option value="QRIS">QRIS</option>
                                 <option value="Transfer Bank">Transfer Bank</option>
@@ -265,46 +295,39 @@
                         </div>
                         <div id="pos-cash-field" class="space-y-2">
                             <label class="block text-xs font-bold text-gray-700">Uang Diterima (Rp)</label>
-                            <input type="number" id="pos-cash-given" oninput="calculatePosChange()" placeholder="0" class="w-full px-3 py-2 border border-gray-300 rounded-xl text-sm font-semibold">
+                            <input type="number" id="pos-cash-given" oninput="calculatePosChange()" placeholder="0" class="w-full px-3 py-2 border rounded-xl text-sm font-semibold">
                             <div class="flex justify-between text-xs font-bold text-gray-600">
                                 <span>Kembalian:</span>
                                 <span id="pos-change-amount" class="text-brand-pink">Rp0</span>
                             </div>
                         </div>
-                        <button onclick="processPosTransaction()" class="w-full py-3 bg-brand-green hover:bg-brand-green-dark text-white font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2">
-                            <i data-lucide="check-circle-2" class="w-5 h-5"></i> Selesaikan & Cetak Struk
-                        </button>
+                        <button onclick="processPosTransaction()" class="w-full py-3 bg-brand-green hover:bg-brand-green-dark text-white font-bold rounded-xl shadow transition">Selesaikan & Cetak Struk</button>
                     </div>
                 </div>
             </div>
 
-            <!-- ADMIN ORDERS -->
+            <!-- ADMIN TAB 3: DAFTAR & KONFIRMASI PESANAN ONLINE -->
             <div id="admin-panel-orders" class="hidden space-y-4">
-                <div class="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm flex flex-wrap gap-2 justify-between items-center">
-                    <h3 class="text-base font-bold text-gray-900">Daftar Pesanan Online Pelanggan</h3>
-                    <select id="order-filter-status" onchange="renderAdminOrders()" class="px-3 py-1.5 border border-gray-300 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-brand-green">
+                <div class="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm flex justify-between items-center">
+                    <h3 class="text-base font-bold text-gray-900">Kelola & Konfirmasi Pesanan Pelanggan</h3>
+                    <select id="order-filter-status" onchange="renderAdminOrders()" class="px-3 py-1.5 border rounded-xl text-xs font-semibold">
                         <option value="ALL">Semua Status</option>
-                        <option value="Menunggu Pembayaran">Menunggu Pembayaran</option>
-                        <option value="Menunggu Verifikasi Pembayaran">Menunggu Verifikasi</option>
-                        <option value="Pembayaran Berhasil">Pembayaran Berhasil</option>
-                        <option value="Sedang Diproses">Sedang Diproses</option>
-                        <option value="Siap Diambil">Siap Diambil</option>
+                        <option value="Menunggu Pembayaran">Menunggu Konfirmasi</option>
+                        <option value="Pembayaran Berhasil / Dikonfirmasi">Dikonfirmasi / Diproses</option>
                         <option value="Selesai">Selesai</option>
-                        <option value="Dibatalkan">Dibatalkan</option>
                     </select>
                 </div>
 
                 <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-x-auto">
                     <table class="w-full text-left text-xs text-gray-700">
-                        <thead class="bg-gray-50 text-gray-900 font-bold border-b">
+                        <thead class="bg-gray-50 font-bold border-b">
                             <tr>
                                 <th class="p-3">ID Pesanan</th>
                                 <th class="p-3">Pelanggan</th>
                                 <th class="p-3">Item Pesanan</th>
                                 <th class="p-3">Total</th>
-                                <th class="p-3">Metode & Tipe</th>
-                                <th class="p-3">Status</th>
-                                <th class="p-3 text-right">Aksi & Konfirmasi</th>
+                                <th class="p-3">Status Saat Ini</th>
+                                <th class="p-3 text-right">Aksi Konfirmasi Pemilik</th>
                             </tr>
                         </thead>
                         <tbody id="admin-orders-table" class="divide-y divide-gray-100"></tbody>
@@ -312,24 +335,22 @@
                 </div>
             </div>
 
-            <!-- ADMIN MENU -->
+            <!-- ADMIN TAB 4: KELOLA MENU -->
             <div id="admin-panel-menu" class="hidden space-y-4">
                 <div class="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm flex justify-between items-center">
-                    <h3 class="text-base font-bold text-gray-900">Kelola Katalog Menu & Stok Bahan</h3>
-                    <button onclick="openMenuModal()" class="px-4 py-2 bg-brand-green text-white text-xs font-bold rounded-xl shadow hover:bg-brand-green-dark transition flex items-center gap-1.5">
-                        <i data-lucide="plus" class="w-4 h-4"></i> Tambah Menu Baru
+                    <h3 class="text-base font-bold text-gray-900">Kelola Menu & Stok</h3>
+                    <button onclick="openMenuModal()" class="px-4 py-2 bg-brand-green text-white text-xs font-bold rounded-xl hover:bg-brand-green-dark transition flex items-center gap-1.5">
+                        <i data-lucide="plus" class="w-4 h-4"></i> Tambah Menu
                     </button>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="admin-menu-cards"></div>
             </div>
 
-            <!-- ADMIN EXPENSES -->
+            <!-- ADMIN TAB 5: PENGELUARAN -->
             <div id="admin-panel-expenses" class="hidden space-y-4">
                 <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <form onsubmit="handleAddExpense(event)" class="space-y-3 lg:col-span-1 border-r pr-0 lg:pr-6">
-                        <h4 class="font-bold text-sm text-gray-900 flex items-center gap-1.5">
-                            <i data-lucide="plus-circle" class="w-4 h-4 text-brand-pink"></i> Catat Pengeluaran
-                        </h4>
+                        <h4 class="font-bold text-sm text-gray-900">Catat Pengeluaran</h4>
                         <div>
                             <label class="block text-[11px] font-bold text-gray-600">Tanggal</label>
                             <input type="date" id="exp-date" required class="w-full px-3 py-2 border rounded-xl text-xs">
@@ -337,26 +358,24 @@
                         <div>
                             <label class="block text-[11px] font-bold text-gray-600">Kategori</label>
                             <select id="exp-category" class="w-full px-3 py-2 border rounded-xl text-xs">
-                                <option value="Bahan Baku">Bahan Baku Makanan</option>
+                                <option value="Bahan Baku">Bahan Baku</option>
                                 <option value="Kemasan">Kemasan & Plastik</option>
-                                <option value="Operasional">Listrik, Air & Gas</option>
-                                <option value="Pengantaran">Biaya Pengantaran / Kurir</option>
-                                <option value="Lainnya">Pengeluaran Lainnya</option>
+                                <option value="Operasional">Operasional (Gas/Listrik)</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[11px] font-bold text-gray-600">Keterangan / Item</label>
-                            <input type="text" id="exp-desc" required placeholder="misal: Belanja Keju Mozzarella" class="w-full px-3 py-2 border rounded-xl text-xs">
+                            <label class="block text-[11px] font-bold text-gray-600">Keterangan</label>
+                            <input type="text" id="exp-desc" required placeholder="misal: Keju Mozzarella" class="w-full px-3 py-2 border rounded-xl text-xs">
                         </div>
                         <div>
                             <label class="block text-[11px] font-bold text-gray-600">Nominal (Rp)</label>
                             <input type="number" id="exp-amount" required placeholder="0" class="w-full px-3 py-2 border rounded-xl text-xs font-bold">
                         </div>
-                        <button type="submit" class="w-full py-2.5 bg-brand-pink text-white font-bold rounded-xl text-xs hover:bg-pink-600 transition">Simpan Pengeluaran</button>
+                        <button type="submit" class="w-full py-2.5 bg-brand-pink text-white font-bold rounded-xl text-xs hover:bg-pink-600">Simpan Pengeluaran</button>
                     </form>
 
                     <div class="lg:col-span-2 space-y-3">
-                        <h4 class="font-bold text-sm text-gray-900">Riwayat Pengeluaran Operasional</h4>
+                        <h4 class="font-bold text-sm text-gray-900">Riwayat Pengeluaran</h4>
                         <div class="overflow-x-auto max-h-[350px]">
                             <table class="w-full text-left text-xs">
                                 <thead class="bg-gray-50 font-bold border-b">
@@ -365,7 +384,6 @@
                                         <th class="p-2">Kategori</th>
                                         <th class="p-2">Keterangan</th>
                                         <th class="p-2 text-right">Nominal</th>
-                                        <th class="p-2 text-center">Hapus</th>
                                     </tr>
                                 </thead>
                                 <tbody id="expenses-table-body" class="divide-y"></tbody>
@@ -375,68 +393,24 @@
                 </div>
             </div>
 
-            <!-- ADMIN REPORTS -->
-            <div id="admin-panel-reports" class="hidden space-y-4">
+            <!-- ADMIN TAB 6: PENGATURAN AKUN PEMILIK -->
+            <div id="admin-panel-account" class="hidden space-y-4 max-w-xl mx-auto">
                 <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                        <h3 class="text-base font-bold text-gray-900">Laporan Penjualan & Keuangan</h3>
-                        <button onclick="exportReportToExcel()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-2">
-                            <i data-lucide="download" class="w-4 h-4"></i> Ekspor Laporan Excel (.xlsx)
+                    <h3 class="text-base font-bold text-gray-900 border-b pb-3 flex items-center gap-2">
+                        <i data-lucide="user-check" class="w-5 h-5 text-brand-green"></i> Pengaturan Akun Pemilik Kedai
+                    </h3>
+                    <form onsubmit="handleSaveAccountSettings(event)" class="space-y-4 text-xs">
+                        <div>
+                            <label class="block font-bold text-gray-700 mb-1">Username Login Baru</label>
+                            <input type="text" id="acc-username" required class="w-full px-3 py-2.5 border rounded-xl font-bold">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-gray-700 mb-1">Password Baru</label>
+                            <input type="password" id="acc-password" required class="w-full px-3 py-2.5 border rounded-xl font-bold">
+                        </div>
+                        <button type="submit" class="w-full py-3 bg-brand-green hover:bg-brand-green-dark text-white font-extrabold rounded-xl shadow transition">
+                            Simpan Perubahan Akun Pemilik
                         </button>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t">
-                        <div class="p-4 bg-gray-50 rounded-xl space-y-1">
-                            <span class="text-xs text-gray-500 font-bold">Total Pendapatan Omzet</span>
-                            <div class="text-xl font-black text-brand-green" id="rep-total-income">Rp0</div>
-                        </div>
-                        <div class="p-4 bg-gray-50 rounded-xl space-y-1">
-                            <span class="text-xs text-gray-500 font-bold">Total Pengeluaran</span>
-                            <div class="text-xl font-black text-brand-pink" id="rep-total-expense">Rp0</div>
-                        </div>
-                        <div class="p-4 bg-brand-green-light rounded-xl space-y-1">
-                            <span class="text-xs text-brand-green font-bold">Laba Bersih Kedai</span>
-                            <div class="text-xl font-black text-brand-green-dark" id="rep-net-profit">Rp0</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ADMIN SETTINGS -->
-            <div id="admin-panel-settings" class="hidden space-y-4">
-                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm max-w-2xl space-y-4">
-                    <h3 class="text-base font-bold text-gray-900 border-b pb-3">Pengaturan Profil & Toko</h3>
-                    <form onsubmit="handleSaveSettings(event)" class="space-y-4 text-xs">
-                        <div>
-                            <label class="block font-bold text-gray-700 mb-1">Nama Kedai</label>
-                            <input type="text" id="set-store-name" class="w-full px-3 py-2 border rounded-xl font-semibold">
-                        </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                                <label class="block font-bold text-gray-700 mb-1">Nomor WhatsApp Resmi</label>
-                                <input type="text" id="set-store-wa" class="w-full px-3 py-2 border rounded-xl font-mono">
-                            </div>
-                            <div>
-                                <label class="block font-bold text-gray-700 mb-1">Status Operasional Kedai</label>
-                                <select id="set-store-status" class="w-full px-3 py-2 border rounded-xl font-bold">
-                                    <option value="OPEN">BUKA (Terima Pesanan)</option>
-                                    <option value="CLOSED">TUTUP (Pemesanan Dinonaktifkan)</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block font-bold text-gray-700 mb-1">Jam Operasional</label>
-                            <input type="text" id="set-store-hours" placeholder="10:00 - 21:00 WIB" class="w-full px-3 py-2 border rounded-xl">
-                        </div>
-                        <div>
-                            <label class="block font-bold text-gray-700 mb-1">Alamat Kedai / Lokasi</label>
-                            <textarea id="set-store-address" rows="2" class="w-full px-3 py-2 border rounded-xl"></textarea>
-                        </div>
-                        <div>
-                            <label class="block font-bold text-gray-700 mb-1">Informasi Rekening Bank & QRIS</label>
-                            <textarea id="set-payment-info" rows="3" class="w-full px-3 py-2 border rounded-xl font-mono"></textarea>
-                        </div>
-                        <button type="submit" class="px-6 py-2.5 bg-brand-green text-white font-bold rounded-xl shadow hover:bg-brand-green-dark transition">Simpan Perubahan Pengaturan</button>
                     </form>
                 </div>
             </div>
@@ -444,14 +418,14 @@
     </main>
 
     <!-- SHOPPING CART SLIDE-OVER DRAWER -->
-    <div id="cart-drawer" class="fixed inset-0 z-50 overflow-hidden hidden" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
+    <div id="cart-drawer" class="fixed inset-0 z-50 overflow-hidden hidden" role="dialog" aria-modal="true">
         <div class="absolute inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity" onclick="toggleCartDrawer()"></div>
         <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
             <div class="pointer-events-auto w-screen max-w-md bg-white shadow-2xl flex flex-col">
-                <div class="p-4 sm:p-6 bg-brand-cream border-b border-brand-cream-dark flex items-center justify-between">
+                <div class="p-4 sm:p-6 bg-brand-cream border-b flex items-center justify-between">
                     <div class="flex items-center space-x-2 text-brand-green">
                         <i data-lucide="shopping-bag" class="w-6 h-6"></i>
-                        <h2 class="text-lg font-bold">Keranjang Pesanan</h2>
+                        <h2 class="text-lg font-bold">Keranjang Belanja</h2>
                     </div>
                     <button onclick="toggleCartDrawer()" class="p-2 text-gray-400 hover:text-gray-600 rounded-full">
                         <i data-lucide="x" class="w-5 h-5"></i>
@@ -460,15 +434,11 @@
 
                 <div id="cart-items-container" class="flex-grow overflow-y-auto p-4 sm:p-6 space-y-4"></div>
 
-                <div class="p-4 sm:p-6 border-t border-gray-100 bg-gray-50 space-y-4">
+                <div class="p-4 sm:p-6 border-t bg-gray-50 space-y-4">
                     <div class="space-y-2 text-xs text-gray-600">
                         <div class="flex justify-between">
                             <span>Subtotal Menu</span>
                             <span id="cart-subtotal" class="font-bold">Rp0</span>
-                        </div>
-                        <div class="flex justify-between text-brand-green font-semibold">
-                            <span>Diskon Promo</span>
-                            <span id="cart-discount-val">-Rp0</span>
                         </div>
                         <div class="flex justify-between text-base font-black text-gray-900 border-t pt-2">
                             <span>Total Pembayaran</span>
@@ -476,13 +446,8 @@
                         </div>
                     </div>
 
-                    <div class="flex gap-2">
-                        <input type="text" id="cart-promo-code" placeholder="Kode Promo (FREYA2026)" class="flex-grow px-3 py-1.5 border rounded-xl text-xs uppercase focus:ring-2 focus:ring-brand-green">
-                        <button onclick="applyPromoCode()" class="px-3 py-1.5 bg-gray-800 text-white text-xs font-bold rounded-xl hover:bg-black">Pakai</button>
-                    </div>
-
-                    <button onclick="openCheckoutModal()" class="w-full py-3.5 bg-brand-green hover:bg-brand-green-dark text-white font-extrabold rounded-xl shadow-lg transition flex items-center justify-center gap-2">
-                        <span>Lanjut ke Formulir Checkout</span>
+                    <button onclick="openCheckoutModal()" class="w-full py-3.5 bg-brand-green hover:bg-brand-green-dark text-white font-extrabold rounded-xl shadow transition flex items-center justify-center gap-2">
+                        <span>Lanjut ke Checkout</span>
                         <i data-lucide="arrow-right" class="w-5 h-5"></i>
                     </button>
                 </div>
@@ -492,11 +457,11 @@
 
     <!-- MODAL CHECKOUT PELANGGAN -->
     <div id="checkout-modal" class="fixed inset-0 z-50 overflow-y-auto bg-gray-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-white max-w-lg w-full rounded-3xl shadow-2xl border border-gray-100 overflow-hidden my-8">
+        <div class="bg-white max-w-lg w-full rounded-3xl shadow-2xl overflow-hidden my-8">
             <div class="p-6 bg-gradient-to-r from-brand-green to-emerald-800 text-white flex justify-between items-center">
                 <div>
                     <h3 class="text-lg font-bold">Lengkapi Data Pemesanan</h3>
-                    <p class="text-xs text-emerald-100">Pesanan akan tersimpan di Cloud & diteruskan ke WhatsApp</p>
+                    <p class="text-xs text-emerald-100">Pesanan akan terkirim otomatis ke WhatsApp Kedai</p>
                 </div>
                 <button onclick="closeCheckoutModal()" class="text-white/80 hover:text-white p-1">
                     <i data-lucide="x" class="w-6 h-6"></i>
@@ -506,13 +471,13 @@
             <form onsubmit="handleCustomerCheckout(event)" class="p-6 space-y-4 text-xs">
                 <div>
                     <label class="block font-bold text-gray-700 mb-1">Nama Pemesan *</label>
-                    <input type="text" id="cust-name" required placeholder="misal: Budi Santoso" class="w-full px-3.5 py-2.5 border rounded-xl text-xs focus:ring-2 focus:ring-brand-green">
+                    <input type="text" id="cust-name" required placeholder="misal: Budi Santoso" class="w-full px-3.5 py-2.5 border rounded-xl text-xs">
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                         <label class="block font-bold text-gray-700 mb-1">Nomor WhatsApp *</label>
-                        <input type="tel" id="cust-phone" required placeholder="08xxxxxxxxxx" class="w-full px-3.5 py-2.5 border rounded-xl text-xs focus:ring-2 focus:ring-brand-green">
+                        <input type="tel" id="cust-phone" required placeholder="08xxxxxxxxxx" class="w-full px-3.5 py-2.5 border rounded-xl text-xs">
                     </div>
                     <div>
                         <label class="block font-bold text-gray-700 mb-1">Metode Pengambilan *</label>
@@ -524,8 +489,8 @@
                 </div>
 
                 <div id="address-field-container" class="hidden">
-                    <label class="block font-bold text-gray-700 mb-1">Alamat Lengkap Pengantaran *</label>
-                    <textarea id="cust-address" rows="2" placeholder="Nama jalan, RT/RW, nomor rumah, patokan" class="w-full px-3.5 py-2.5 border rounded-xl text-xs"></textarea>
+                    <label class="block font-bold text-gray-700 mb-1">Alamat Pengantaran *</label>
+                    <textarea id="cust-address" rows="2" placeholder="Nama jalan, RT/RW, nomor rumah" class="w-full px-3.5 py-2.5 border rounded-xl text-xs"></textarea>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -533,24 +498,14 @@
                         <label class="block font-bold text-gray-700 mb-1">Metode Pembayaran *</label>
                         <select id="cust-payment-method" class="w-full px-3.5 py-2.5 border rounded-xl text-xs font-semibold">
                             <option value="QRIS">QRIS Statis</option>
-                            <option value="Transfer Bank">Transfer Bank BCA/Mandiri</option>
-                            <option value="E-Wallet">E-Wallet (Gopay/OVO/Dana)</option>
+                            <option value="Transfer Bank">Transfer Bank (BCA/Mandiri)</option>
                             <option value="Tunai">Tunai di Kedai</option>
                         </select>
                     </div>
                     <div>
                         <label class="block font-bold text-gray-700 mb-1">Catatan Pesanan</label>
-                        <input type="text" id="cust-notes" placeholder="misal: Sambal dipisah, ekstra pedas" class="w-full px-3.5 py-2.5 border rounded-xl text-xs">
+                        <input type="text" id="cust-notes" placeholder="misal: Pedas, keju dipisah" class="w-full px-3.5 py-2.5 border rounded-xl text-xs">
                     </div>
-                </div>
-
-                <div class="p-4 bg-brand-cream rounded-2xl border border-brand-cream-dark text-gray-700 space-y-2">
-                    <div class="font-bold text-brand-green text-xs flex items-center gap-1.5">
-                        <i data-lucide="info" class="w-4 h-4"></i> Instruksi Pembayaran & Konfirmasi
-                    </div>
-                    <p class="text-[11px] leading-relaxed">
-                        Silakan kirim pembayaran via QRIS / Transfer setelah pesanan terkirim. Pesanan akan otomatis tersimpan di cloud Firebase dan diproses setelah diverifikasi Admin Kedai Mama Freya.
-                    </p>
                 </div>
 
                 <div class="border-t pt-4 flex justify-between items-center">
@@ -558,27 +513,27 @@
                         <span class="block text-[10px] text-gray-500 uppercase font-bold">Total Pembayaran</span>
                         <span id="modal-checkout-total" class="text-lg font-black text-brand-pink">Rp0</span>
                     </div>
-                    <button type="submit" class="px-6 py-3 bg-brand-pink hover:bg-pink-600 text-white font-extrabold text-xs rounded-xl shadow-lg transition flex items-center gap-2">
-                        <i data-lucide="send" class="w-4 h-4"></i> Kirim & Buka WhatsApp
+                    <button type="submit" class="px-6 py-3 bg-brand-pink hover:bg-pink-600 text-white font-extrabold text-xs rounded-xl shadow transition flex items-center gap-2">
+                        <i data-lucide="send" class="w-4 h-4"></i> Kirim ke WhatsApp
                     </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- MODAL TAMBAH/EDIT MENU (ADMIN) -->
+    <!-- MODAL EDIT/TAMBAH MENU -->
     <div id="menu-modal" class="fixed inset-0 z-50 overflow-y-auto bg-gray-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-white max-w-md w-full rounded-3xl shadow-2xl p-6 space-y-4">
-            <h3 id="menu-modal-title" class="text-lg font-bold text-gray-900 border-b pb-2">Tambah Menu Baru</h3>
+            <h3 id="menu-modal-title" class="text-lg font-bold border-b pb-2">Tambah Menu Baru</h3>
             <form onsubmit="handleSaveMenuItem(event)" class="space-y-3 text-xs">
                 <input type="hidden" id="menu-edit-id">
                 <div>
-                    <label class="block font-bold text-gray-700 mb-1">Nama Produk</label>
+                    <label class="block font-bold mb-1">Nama Produk</label>
                     <input type="text" id="menu-form-name" required class="w-full px-3 py-2 border rounded-xl">
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block font-bold text-gray-700 mb-1">Kategori</label>
+                        <label class="block font-bold mb-1">Kategori</label>
                         <select id="menu-form-category" class="w-full px-3 py-2 border rounded-xl">
                             <option value="Donat">Donat</option>
                             <option value="Corndog mozzarella">Corndog mozzarella</option>
@@ -592,27 +547,27 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block font-bold text-gray-700 mb-1">Harga (Rp)</label>
+                        <label class="block font-bold mb-1">Harga (Rp)</label>
                         <input type="number" id="menu-form-price" required class="w-full px-3 py-2 border rounded-xl font-bold">
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block font-bold text-gray-700 mb-1">Stok Saat Ini</label>
+                        <label class="block font-bold mb-1">Stok</label>
                         <input type="number" id="menu-form-stock" required class="w-full px-3 py-2 border rounded-xl font-bold">
                     </div>
                     <div>
-                        <label class="block font-bold text-gray-700 mb-1">URL Gambar</label>
+                        <label class="block font-bold mb-1">URL Gambar</label>
                         <input type="text" id="menu-form-image" placeholder="https://..." class="w-full px-3 py-2 border rounded-xl">
                     </div>
                 </div>
                 <div>
-                    <label class="block font-bold text-gray-700 mb-1">Deskripsi Singkat</label>
+                    <label class="block font-bold mb-1">Deskripsi</label>
                     <textarea id="menu-form-desc" rows="2" class="w-full px-3 py-2 border rounded-xl"></textarea>
                 </div>
                 <div class="flex justify-end space-x-2 pt-3 border-t">
-                    <button type="button" onclick="closeMenuModal()" class="px-4 py-2 border rounded-xl font-bold text-gray-600">Batal</button>
-                    <button type="submit" class="px-5 py-2 bg-brand-green text-white font-bold rounded-xl shadow hover:bg-brand-green-dark">Simpan Menu</button>
+                    <button type="button" onclick="closeMenuModal()" class="px-4 py-2 border rounded-xl font-bold">Batal</button>
+                    <button type="submit" class="px-5 py-2 bg-brand-green text-white font-bold rounded-xl shadow">Simpan</button>
                 </div>
             </form>
         </div>
@@ -626,15 +581,12 @@
         </div>
     </footer>
 
-    <!-- JAVASCRIPT LOGIC & FIREBASE REALTIME SYNC -->
+    <!-- JAVASCRIPT & FIREBASE CONFIG -->
     <script>
-        // =========================================================================
-        // FIREBASE INITIALIZATION (Sesuai kredensial di tangkapan layar kamu)
-        // =========================================================================
         const firebaseConfig = {
             apiKey: "AIzaSyBuL2PuUe4srwbPR_j0JCs0-LUarHtZ5yw",
             authDomain: "kedai-mama-be97b.firebaseapp.com",
-            databaseURL: "https://kedai-mama-be97b-default-rtdb.firebaseio.com",
+            databaseURL: "https://kedai-mama-be97b-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "kedai-mama-be97b",
             storageBucket: "kedai-mama-be97b.firebasestorage.app",
             messagingSenderId: "679953370425",
@@ -656,48 +608,85 @@
 
         const OFFICIAL_WA = "6285184560806";
 
+        // MANAJEMEN AKUN PEMILIK KEDAI
+        let ownerAccount = JSON.parse(localStorage.getItem('kmf_owner_account')) || {
+            username: "admin",
+            password: "admin123"
+        };
+
         const DEFAULT_MENU = [
             { id: 'M1', name: 'Donat Lumer Coklat Keju', category: 'Donat', price: 15000, stock: 25, image: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=400&q=80', description: 'Donat lembut isi lelehan coklat melimpah dengan parutan keju gurih.' },
             { id: 'M2', name: 'Corndog Mozzarella Full', category: 'Corndog mozzarella', price: 18000, stock: 20, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=400&q=80', description: 'Keju mozzarella mulur dibalut adonan crispy khas Kedai Mama Freya.' },
-            { id: 'M3', name: 'Pisang Nugget Matcha Topping Almond', category: 'Pisang nugget', price: 16000, stock: 18, image: 'https://images.unsplash.com/photo-1587314168485-3236d6710814?auto=format&fit=crop&w=400&q=80', description: 'Pisang manis crispy dilapisi glaze matcha berkualitas dan taburan almond.' },
-            { id: 'M4', name: 'Piscok Lumer Melted', category: 'Piscok', price: 12000, stock: 30, image: 'https://images.unsplash.com/photo-1541592106381-b31e9677c0e5?auto=format&fit=crop&w=400&q=80', description: 'Pisang coklat kulit lumpia renyah dengan coklat kental yang meleleh di mulut.' },
-            { id: 'M5', name: 'Roti Bakar Spesial Coklat Keju', category: 'Roti bakar', price: 20000, stock: 15, image: 'https://images.unsplash.com/photo-1509722747041-616f39b57569?auto=format&fit=crop&w=400&q=80', description: 'Roti tebal dipanggang dengan mentega wangi, selai coklat kental & keju tebal.' },
-            { id: 'M6', name: 'Lumpia Ubi Ungu Lumer', category: 'Lumpia ubi ungu lumer', price: 15000, stock: 22, image: 'https://images.unsplash.com/photo-1541592106381-b31e9677c0e5?auto=format&fit=crop&w=400&q=80', description: 'Olahan ubi ungu manis alami yang lumer di dalam renyahnya kulit lumpia.' },
-            { id: 'M7', name: 'Dimsum Ayam Udang Mix (5 Pcs)', category: 'Dimsum', price: 22000, stock: 40, image: 'https://images.unsplash.com/photo-1496116218417-1a781b1c416c?auto=format&fit=crop&w=400&q=80', description: 'Dimsum olahan daging ayam segar dan udang padat disajikan dengan chili oil pedas.' },
-            { id: 'M8', name: 'Pangsit Goreng Crispy Chili Oil', category: 'Pangsit goreng dan rebus', price: 16000, stock: 25, image: 'https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?auto=format&fit=crop&w=400&q=80', description: 'Pangsit goreng renyah isi olahan ayam berempah lengkap dengan saus pedas gurih.' },
-            { id: 'M9', name: 'Martabak Telur Daging Sapi Mini', category: 'Martabak telur', price: 25000, stock: 12, image: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=400&q=80', description: 'Martabak telur kaya rempah isi daging sapi cincang dan daun bawang super gurih.' }
+            { id: 'M3', name: 'Pisang Nugget Matcha Almond', category: 'Pisang nugget', price: 16000, stock: 18, image: 'https://images.unsplash.com/photo-1587314168485-3236d6710814?auto=format&fit=crop&w=400&q=80', description: 'Pisang manis crispy dilapisi glaze matcha dan taburan almond.' },
+            { id: 'M4', name: 'Piscok Lumer Melted', category: 'Piscok', price: 12000, stock: 30, image: 'https://images.unsplash.com/photo-1541592106381-b31e9677c0e5?auto=format&fit=crop&w=400&q=80', description: 'Pisang coklat kulit lumpia renyah dengan coklat kental yang meleleh.' },
+            { id: 'M5', name: 'Roti Bakar Spesial Coklat Keju', category: 'Roti bakar', price: 20000, stock: 15, image: 'https://images.unsplash.com/photo-1509722747041-616f39b57569?auto=format&fit=crop&w=400&q=80', description: 'Roti tebal dipanggang dengan mentega wangi, selai coklat & keju.' },
+            { id: 'M6', name: 'Lumpia Ubi Ungu Lumer', category: 'Lumpia ubi ungu lumer', price: 15000, stock: 22, image: 'https://images.unsplash.com/photo-1541592106381-b31e9677c0e5?auto=format&fit=crop&w=400&q=80', description: 'Olahan ubi ungu manis alami yang lumer di dalam renyahnya lumpia.' },
+            { id: 'M7', name: 'Dimsum Ayam Udang Mix (5 Pcs)', category: 'Dimsum', price: 22000, stock: 40, image: 'https://images.unsplash.com/photo-1496116218417-1a781b1c416c?auto=format&fit=crop&w=400&q=80', description: 'Dimsum olahan daging ayam segar dan udang padat dengan chili oil.' },
+            { id: 'M8', name: 'Pangsit Goreng Crispy Chili Oil', category: 'Pangsit goreng dan rebus', price: 16000, stock: 25, image: 'https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?auto=format&fit=crop&w=400&q=80', description: 'Pangsit goreng renyah isi olahan ayam lengkap dengan saus pedas.' },
+            { id: 'M9', name: 'Martabak Telur Daging Sapi Mini', category: 'Martabak telur', price: 25000, stock: 12, image: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=400&q=80', description: 'Martabak telur kaya rempah isi daging sapi cincang & daun bawang.' }
         ];
 
         let menuState = JSON.parse(localStorage.getItem('kmf_menu')) || DEFAULT_MENU;
         let ordersState = JSON.parse(localStorage.getItem('kmf_orders')) || [];
-        let expensesState = JSON.parse(localStorage.getItem('kmf_expenses')) || [
-            { id: 'E1', date: '2026-10-24', category: 'Bahan Baku', desc: 'Belanja Keju Mozzarella & Tepung', amount: 150000 },
-            { id: 'E2', date: '2026-10-25', category: 'Kemasan', desc: 'Beli Box Donat & Plastik Takeaway', amount: 45000 }
-        ];
-        let settingsState = JSON.parse(localStorage.getItem('kmf_settings')) || {
-            storeName: "KEDAI MAMA FREYA",
-            phone: "085184560806",
-            status: "OPEN",
-            hours: "10:00 - 21:00 WIB",
-            address: "Jl. Otista Raya No. 45, Jakarta Timur",
-            paymentInfo: "QRIS All Payment\nBank BCA: 8830-123-999 a.n MAMA FREYA\nMandiri: 127-001-9988-11"
-        };
+        let expensesState = JSON.parse(localStorage.getItem('kmf_expenses')) || [];
 
         let cart = [];
         let posCart = [];
         let activeCategory = 'ALL';
-        let appliedDiscount = 0;
         let salesChartInstance = null;
+
+        function showRoleSelection() {
+            document.getElementById('view-role-selection').classList.remove('hidden');
+            document.getElementById('view-customer').classList.add('hidden');
+            document.getElementById('view-track').classList.add('hidden');
+            document.getElementById('view-admin-login').classList.add('hidden');
+            document.getElementById('view-admin-dashboard').classList.add('hidden');
+            document.getElementById('customer-nav-controls').classList.add('hidden');
+        }
+
+        function selectRole(role) {
+            document.getElementById('view-role-selection').classList.add('hidden');
+            if (role === 'customer') {
+                document.getElementById('customer-nav-controls').classList.remove('hidden');
+                switchView('customer');
+            } else {
+                document.getElementById('customer-nav-controls').classList.add('hidden');
+                switchView('admin-login');
+            }
+        }
+
+        function switchView(viewName) {
+            document.getElementById('view-customer').classList.add('hidden');
+            document.getElementById('view-track').classList.add('hidden');
+            document.getElementById('view-admin-login').classList.add('hidden');
+            document.getElementById('view-admin-dashboard').classList.add('hidden');
+
+            if (viewName === 'customer') {
+                document.getElementById('view-customer').classList.remove('hidden');
+                renderCustomerMenu();
+            } else if (viewName === 'track') {
+                document.getElementById('view-track').classList.remove('hidden');
+            } else if (viewName === 'admin-login') {
+                if (sessionStorage.getItem('kmf_admin_logged') === 'true') {
+                    document.getElementById('view-admin-dashboard').classList.remove('hidden');
+                    renderAdminDashboard();
+                } else {
+                    document.getElementById('view-admin-login').classList.remove('hidden');
+                    document.getElementById('login-username').value = ownerAccount.username;
+                }
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
         function saveData() {
             localStorage.setItem('kmf_menu', JSON.stringify(menuState));
             localStorage.setItem('kmf_orders', JSON.stringify(ordersState));
             localStorage.setItem('kmf_expenses', JSON.stringify(expensesState));
-            localStorage.setItem('kmf_settings', JSON.stringify(settingsState));
+            localStorage.setItem('kmf_owner_account', JSON.stringify(ownerAccount));
 
             if (isFirebaseActive) {
                 db.ref('menu').set(menuState);
-                db.ref('settings').set(settingsState);
+                db.ref('owner_account').set(ownerAccount);
             }
         }
 
@@ -728,53 +717,18 @@
                     renderCustomerMenu();
                 }
             });
+
+            db.ref('owner_account').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    ownerAccount = data;
+                    localStorage.setItem('kmf_owner_account', JSON.stringify(ownerAccount));
+                }
+            });
         }
 
         function formatRp(amount) {
             return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(amount);
-        }
-
-        function switchView(viewName) {
-            document.getElementById('view-customer').classList.add('hidden');
-            document.getElementById('view-track').classList.add('hidden');
-            document.getElementById('view-admin-login').classList.add('hidden');
-            document.getElementById('view-admin-dashboard').classList.add('hidden');
-
-            if (viewName === 'customer') {
-                document.getElementById('view-customer').classList.remove('hidden');
-                renderCustomerMenu();
-            } else if (viewName === 'track') {
-                document.getElementById('view-track').classList.remove('hidden');
-            } else if (viewName === 'admin-login') {
-                if (sessionStorage.getItem('kmf_admin_logged') === 'true') {
-                    document.getElementById('view-admin-dashboard').classList.remove('hidden');
-                    renderAdminDashboard();
-                } else {
-                    document.getElementById('view-admin-login').classList.remove('hidden');
-                }
-            }
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function switchAdminTab(tabName) {
-            const tabs = ['overview', 'pos', 'orders', 'menu', 'expenses', 'reports', 'settings'];
-            tabs.forEach(t => {
-                document.getElementById(`admin-panel-${t}`).classList.add('hidden');
-                document.getElementById(`tab-${t}`).classList.remove('bg-brand-green', 'text-white');
-                document.getElementById(`tab-${t}`).classList.add('bg-gray-100', 'text-gray-700');
-            });
-
-            document.getElementById(`admin-panel-${tabName}`).classList.remove('hidden');
-            document.getElementById(`tab-${tabName}`).classList.add('bg-brand-green', 'text-white');
-            document.getElementById(`tab-${tabName}`).classList.remove('bg-gray-100', 'text-gray-700');
-
-            if (tabName === 'overview') renderAdminOverview();
-            if (tabName === 'pos') renderPosMenu();
-            if (tabName === 'orders') renderAdminOrders();
-            if (tabName === 'menu') renderAdminMenu();
-            if (tabName === 'expenses') renderExpenses();
-            if (tabName === 'reports') renderFinancialReports();
-            if (tabName === 'settings') loadSettingsForm();
         }
 
         function renderCategoryChips() {
@@ -804,14 +758,6 @@
                 return matchesCat && matchesSearch;
             });
 
-            if (filtered.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center py-12 space-y-2"><i data-lucide="utensils-crossed" class="w-12 h-12 text-gray-300 mx-auto"></i><p class="text-sm font-bold text-gray-500">Menu tidak ditemukan atau stok habis.</p></div>`;
-                lucide.createIcons();
-                return;
-            }
-
-            const isClosed = settingsState.status === 'CLOSED';
-
             grid.innerHTML = filtered.map(item => `
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition">
                     <div class="relative h-44 w-full bg-gray-100 overflow-hidden">
@@ -829,23 +775,13 @@
                                 <span class="text-xs text-gray-400 block font-medium">Stok: ${item.stock}</span>
                                 <span class="text-base font-black text-brand-green">${formatRp(item.price)}</span>
                             </div>
-                            <button onclick="addToCart('${item.id}')" ${item.stock <= 0 || isClosed ? 'disabled' : ''} class="px-3.5 py-2 ${item.stock <= 0 || isClosed ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-brand-pink hover:bg-pink-600 text-white shadow-md'} rounded-xl font-bold text-xs transition flex items-center gap-1">
+                            <button onclick="addToCart('${item.id}')" ${item.stock <= 0 ? 'disabled' : ''} class="px-3.5 py-2 ${item.stock <= 0 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-brand-pink hover:bg-pink-600 text-white shadow-md'} rounded-xl font-bold text-xs transition flex items-center gap-1">
                                 <i data-lucide="plus" class="w-4 h-4"></i> Tambah
                             </button>
                         </div>
                     </div>
                 </div>
             `).join('');
-
-            document.getElementById('display-store-hours').innerText = `Jam Buka: ${settingsState.hours}`;
-            const storeBadge = document.getElementById('store-badge');
-            if (isClosed) {
-                storeBadge.innerText = '● KEDAI TUTUP';
-                storeBadge.className = 'inline-block px-3 py-1 bg-red-500 text-white rounded-full text-xs font-semibold';
-            } else {
-                storeBadge.innerText = '● KEDAI BUKA';
-                storeBadge.className = 'inline-block px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-semibold';
-            }
 
             lucide.createIcons();
         }
@@ -897,11 +833,8 @@
             }
 
             const subtotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
-            const total = Math.max(0, subtotal - appliedDiscount);
-
             document.getElementById('cart-subtotal').innerText = formatRp(subtotal);
-            document.getElementById('cart-discount-val').innerText = `- ${formatRp(appliedDiscount)}`;
-            document.getElementById('cart-total').innerText = formatRp(total);
+            document.getElementById('cart-total').innerText = formatRp(subtotal);
 
             lucide.createIcons();
         }
@@ -923,22 +856,10 @@
             else drawer.classList.toggle('hidden');
         }
 
-        function applyPromoCode() {
-            const code = document.getElementById('cart-promo-code').value.trim().toUpperCase();
-            if (code === 'FREYA2026' || code === 'MAMAFREYA') {
-                appliedDiscount = 5000;
-                alert('Promo Berhasil! Diskon Rp5.000');
-            } else {
-                appliedDiscount = 0;
-                alert('Kode promo tidak valid!');
-            }
-            updateCartUI();
-        }
-
         function openCheckoutModal() {
             if (cart.length === 0) return alert('Keranjang belanja kosong!');
             const subtotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
-            document.getElementById('modal-checkout-total').innerText = formatRp(Math.max(0, subtotal - appliedDiscount));
+            document.getElementById('modal-checkout-total').innerText = formatRp(subtotal);
             toggleCartDrawer(false);
             document.getElementById('checkout-modal').classList.remove('hidden');
         }
@@ -961,7 +882,6 @@
 
         function handleCustomerCheckout(event) {
             event.preventDefault();
-            if (settingsState.status === 'CLOSED') return alert('Mohon maaf, kedai sedang tutup.');
 
             const name = document.getElementById('cust-name').value.trim();
             const phone = document.getElementById('cust-phone').value.trim();
@@ -971,7 +891,7 @@
             const notes = document.getElementById('cust-notes').value.trim() || '-';
 
             const subtotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
-            const totalAmount = Math.max(0, subtotal - appliedDiscount);
+            const totalAmount = subtotal;
 
             const dateStr = new Date().toISOString().slice(0,10).replace(/-/g,'');
             const randomCode = Math.random().toString(36).substring(2, 6).toUpperCase();
@@ -988,7 +908,6 @@
                 paymentMethod: paymentMethod,
                 items: [...cart],
                 subtotal: subtotal,
-                discount: appliedDiscount,
                 totalAmount: totalAmount,
                 notes: notes,
                 paymentStatus: 'Menunggu Pembayaran',
@@ -1021,11 +940,10 @@
             const waUrl = `https://wa.me/${OFFICIAL_WA}?text=${encodeURIComponent(messageText)}`;
 
             cart = [];
-            appliedDiscount = 0;
             updateCartUI();
             closeCheckoutModal();
 
-            alert(`Pesanan ${orderId} tersimpan! Membuka WhatsApp Kedai Mama Freya...`);
+            alert(`Pesanan ${orderId} tersimpan! Membuka WhatsApp Kedai Mama Freya (${OFFICIAL_WA})...`);
             window.open(waUrl, '_blank');
             switchView('customer');
         }
@@ -1047,10 +965,11 @@
                 <div class="space-y-4 text-xs">
                     <div class="flex justify-between items-center border-b pb-2">
                         <span class="font-mono font-bold text-sm text-brand-green">${found.id}</span>
-                        <span class="px-2 py-0.5 rounded font-bold bg-amber-100 text-amber-800">${found.orderStatus}</span>
+                        <span class="px-2 py-0.5 rounded font-bold ${found.orderStatus.includes('Berhasil') ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}">${found.orderStatus}</span>
                     </div>
-                    <p>Nama: <b>${found.customerName}</b></p>
-                    <p>Total: <b class="text-brand-pink">${formatRp(found.totalAmount)}</b></p>
+                    <p>Nama Pemesan: <b>${found.customerName}</b></p>
+                    <p>Total Pembayaran: <b class="text-brand-pink">${formatRp(found.totalAmount)}</b></p>
+                    <p>Status Terkini: <b>${found.orderStatus}</b></p>
                 </div>
             `;
         }
@@ -1060,22 +979,24 @@
             const u = document.getElementById('login-username').value.trim();
             const p = document.getElementById('login-password').value.trim();
 
-            if (u === 'admin' && p === 'admin123') {
+            if (u === ownerAccount.username && p === ownerAccount.password) {
                 sessionStorage.setItem('kmf_admin_logged', 'true');
                 switchView('admin-login');
             } else {
-                alert('Username/Password Admin Salah!');
+                alert('Username atau Password Pemilik Kedai Salah!');
             }
         }
 
         function logoutAdmin() {
             sessionStorage.removeItem('kmf_admin_logged');
-            switchView('customer');
+            showRoleSelection();
         }
 
         function renderAdminDashboard() {
             renderAdminOverview();
             renderPendingBadge();
+            document.getElementById('acc-username').value = ownerAccount.username;
+            document.getElementById('acc-password').value = ownerAccount.password;
         }
 
         function renderPendingBadge() {
@@ -1095,6 +1016,8 @@
             const salesToday = completedOrders.filter(o => o.date.startsWith(todayStr)).reduce((sum, o) => sum + o.totalAmount, 0);
 
             document.getElementById('dash-sales-today').innerText = formatRp(salesToday);
+            document.getElementById('dash-sales-month').innerText = completedOrders.length;
+            document.getElementById('dash-online-count').innerText = ordersState.filter(o => o.type === 'ONLINE').length;
             initSalesChart();
         }
 
@@ -1180,10 +1103,9 @@
                 paymentMethod: document.getElementById('pos-payment-method').value,
                 items: [...posCart],
                 subtotal: total,
-                discount: 0,
                 totalAmount: total,
                 notes: 'Kasir POS',
-                paymentStatus: 'Pembayaran Berhasil',
+                paymentStatus: 'Pembayaran Berhasil / Dikonfirmasi',
                 orderStatus: 'Selesai'
             };
 
@@ -1196,38 +1118,70 @@
             updatePosCartUI();
         }
 
+        // FITUR KONFIRMASI PESANAN PELANGGAN OLEH PEMILIK KEDAI
         function renderAdminOrders() {
             const tbody = document.getElementById('admin-orders-table');
-            tbody.innerHTML = ordersState.map(o => `
+            const filter = document.getElementById('order-filter-status').value;
+
+            const filtered = ordersState.filter(o => filter === 'ALL' || o.orderStatus === filter);
+
+            tbody.innerHTML = filtered.map(o => `
                 <tr class="hover:bg-gray-50">
                     <td class="p-3 font-mono font-bold">${o.id}</td>
                     <td class="p-3">${o.customerName}<br><span class="text-gray-400">${o.phone}</span></td>
-                    <td class="p-3">${o.items.map(i => i.name).join(', ')}</td>
+                    <td class="p-3">${o.items.map(i => `${i.name} (x${i.qty})`).join(', ')}</td>
                     <td class="p-3 font-bold text-brand-green">${formatRp(o.totalAmount)}</td>
-                    <td class="p-3">${o.paymentMethod}</td>
                     <td class="p-3">
-                        <select onchange="updateOrderStatus('${o.id}', this.value)" class="border rounded text-xs p-1">
-                            <option value="Menunggu Pembayaran" ${o.orderStatus === 'Menunggu Pembayaran' ? 'selected' : ''}>Menunggu Pembayaran</option>
-                            <option value="Pembayaran Berhasil" ${o.orderStatus === 'Pembayaran Berhasil' ? 'selected' : ''}>Pembayaran Berhasil</option>
-                            <option value="Sedang Diproses" ${o.orderStatus === 'Sedang Diproses' ? 'selected' : ''}>Sedang Diproses</option>
-                            <option value="Selesai" ${o.orderStatus === 'Selesai' ? 'selected' : ''}>Selesai</option>
-                            <option value="Dibatalkan" ${o.orderStatus === 'Dibatalkan' ? 'selected' : ''}>Dibatalkan</option>
-                        </select>
+                        <span class="px-2 py-1 rounded text-[10px] font-bold ${o.orderStatus.includes('Berhasil') ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}">
+                            ${o.orderStatus}
+                        </span>
                     </td>
-                    <td class="p-3 text-right">
-                        <button onclick="window.open('https://wa.me/${o.phone}?text=Pesanan%20${o.id}%20diproses','_blank')" class="bg-green-600 text-white px-2 py-1 rounded text-[10px]">WA</button>
+                    <td class="p-3 text-right space-x-1">
+                        ${o.orderStatus === 'Menunggu Pembayaran' ? `
+                            <button onclick="confirmCustomerOrder('${o.id}')" class="bg-brand-green hover:bg-brand-green-dark text-white font-bold px-2.5 py-1 rounded-lg text-[10px] shadow">
+                                ✓ Konfirmasi Pesanan
+                            </button>
+                        ` : ''}
+                        <button onclick="sendWaConfirmation('${o.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2 py-1 rounded-lg text-[10px]">
+                            Kirim WA
+                        </button>
                     </td>
                 </tr>
             `).join('');
+
+            lucide.createIcons();
         }
 
-        function updateOrderStatus(id, status) {
-            const target = ordersState.find(o => o.id === id);
+        function confirmCustomerOrder(orderId) {
+            const target = ordersState.find(o => o.id === orderId);
             if (target) {
-                target.orderStatus = status;
+                target.orderStatus = "Pembayaran Berhasil / Dikonfirmasi";
+                target.paymentStatus = "Pembayaran Berhasil / Dikonfirmasi";
                 saveData();
                 saveOrderToFirebase(target);
+                alert(`Pesanan ${orderId} milik ${target.customerName} telah berhasil DIKONFIRMASI!`);
+                renderAdminOrders();
+                renderPendingBadge();
             }
+        }
+
+        function sendWaConfirmation(orderId) {
+            const target = ordersState.find(o => o.id === orderId);
+            if (!target) return;
+
+            let msg = `Halo ${target.customerName}, pesanan Anda di KEDAI MAMA FREYA (${target.id}) telah DIKONFIRMASI oleh Pemilik Kedai.\n\nStatus Pesanan: ${target.orderStatus}\nTotal: ${formatRp(target.totalAmount)}\n\nPesanan sedang dipersiapkan. Terima kasih!`;
+            window.open(`https://wa.me/${target.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+
+        function handleSaveAccountSettings(e) {
+            e.preventDefault();
+            const u = document.getElementById('acc-username').value.trim();
+            const p = document.getElementById('acc-password').value.trim();
+
+            ownerAccount.username = u;
+            ownerAccount.password = p;
+            saveData();
+            alert('Akun Pemilik Kedai berhasil diperbarui!');
         }
 
         function renderAdminMenu() {
@@ -1331,34 +1285,29 @@
             XLSX.writeFile(wb, "Laporan_KedaiMamaFreya.xlsx");
         }
 
-        function loadSettingsForm() {
-            document.getElementById('set-store-name').value = settingsState.storeName;
-            document.getElementById('set-store-wa').value = settingsState.phone;
-            document.getElementById('set-store-status').value = settingsState.status;
-            document.getElementById('set-store-hours').value = settingsState.hours;
-            document.getElementById('set-store-address').value = settingsState.address;
-            document.getElementById('set-payment-info').value = settingsState.paymentInfo;
-        }
+        function switchAdminTab(tabName) {
+            const tabs = ['overview', 'pos', 'orders', 'menu', 'expenses', 'account'];
+            tabs.forEach(t => {
+                document.getElementById(`admin-panel-${t}`).classList.add('hidden');
+                document.getElementById(`tab-${t}`).classList.remove('bg-brand-green', 'text-white');
+                document.getElementById(`tab-${t}`).classList.add('bg-gray-100', 'text-gray-700');
+            });
 
-        function handleSaveSettings(e) {
-            e.preventDefault();
-            settingsState.storeName = document.getElementById('set-store-name').value;
-            settingsState.phone = document.getElementById('set-store-wa').value;
-            settingsState.status = document.getElementById('set-store-status').value;
-            settingsState.hours = document.getElementById('set-store-hours').value;
-            settingsState.address = document.getElementById('set-store-address').value;
-            settingsState.paymentInfo = document.getElementById('set-payment-info').value;
+            document.getElementById(`admin-panel-${tabName}`).classList.remove('hidden');
+            document.getElementById(`tab-${tabName}`).classList.add('bg-brand-green', 'text-white');
 
-            saveData();
-            alert('Pengaturan disimpan!');
-            renderCustomerMenu();
+            if (tabName === 'overview') renderAdminOverview();
+            if (tabName === 'pos') renderPosMenu();
+            if (tabName === 'orders') renderAdminOrders();
+            if (tabName === 'menu') renderAdminMenu();
+            if (tabName === 'expenses') renderExpenses();
+            if (tabName === 'reports') renderFinancialReports();
         }
 
         window.addEventListener('DOMContentLoaded', () => {
             saveData();
             listenRealtimeFirebase();
-            renderCustomerMenu();
-            updateCartUI();
+            showRoleSelection();
             lucide.createIcons();
         });
     </script>
